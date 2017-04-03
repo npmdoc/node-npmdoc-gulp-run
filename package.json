@@ -1,17 +1,40 @@
 {
-    "buildNpmdoc":"gulp-run",
+    "author": "kai zhu <kaizhu256@gmail.com>",
+    "buildNpmdoc": "gulp-run",
+    "description": "api documentation for [gulp-run (v1.7.1)](https://github.com/MrBoolean/gulp-run) [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-run.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-run) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-run.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-run)",
     "devDependencies": {
-        "gulp-run": "*",
         "electron-lite": "kaizhu256/node-electron-lite#alpha",
+        "gulp-run": "*",
         "utility2": "kaizhu256/node-utility2#alpha"
     },
-    "name":"npmdoc-gulp-run",
+    "engines": {
+        "node": ">=4.0"
+    },
+    "homepage": "https://github.com/npmdoc/node-npmdoc-gulp-run",
+    "keywords": [
+        "documentation",
+        "gulp-run"
+    ],
+    "license": "MIT",
+    "main": "lib.npmdoc_gulp_run.js",
+    "name": "npmdoc-gulp-run",
+    "nameAlias": "npmdoc_gulp_run",
+    "nameOriginal": "npmdoc-gulp-run",
+    "os": [
+        "darwin",
+        "linux"
+    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/npmdoc/node-npmdoc-gulp-run.git"
     },
     "scripts": {
-        "build-ci": "utility2 shReadmeTest build_ci.sh"
+        "build-ci": "utility2 shReadmeTest build_ci.sh",
+        "env": "env",
+        "heroku-postbuild": "(set -e; npm install \"kaizhu256/node-utility2#alpha\"; utility2 shDeployHeroku)",
+        "postinstall": "if [ -f npm_scripts.sh ]; then ./npm_scripts.sh postinstall; fi",
+        "start": "(set -e; export PORT=${PORT:-8080}; utility2 start test.js)",
+        "test": "(set -e; export PORT=$(utility2 shServerPortRandom); utility2 test test.js)"
     },
     "version": "0.0.1"
 }
