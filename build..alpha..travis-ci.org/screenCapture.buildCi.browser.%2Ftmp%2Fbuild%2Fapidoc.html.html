@@ -1,4 +1,4 @@
-<div class="apidocDiv">
+<html><head></head><body><div class="apidocDiv">
 <style>
 /*csslint
 */
@@ -47,17 +47,10 @@
 }
 </style>
 <h1>api documentation for
-    <a
-
-        href="https://github.com/MrBoolean/gulp-run"
-
-    >gulp-run (v1.7.1)</a>
+    <a href="https://github.com/MrBoolean/gulp-run">gulp-run (v1.7.1)</a>
 </h1>
 <h4>Pipe to shell commands in gulp</h4>
-<div class="apidocSectionDiv"><a
-    href="#apidoc.tableOfContents"
-    id="apidoc.tableOfContents"
-><h1>table of contents</h1></a><ol>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
 
     <li class="apidocModuleLi"><a href="#apidoc.module.gulp-run">module gulp-run</a><ol>
 
@@ -235,34 +228,34 @@
 
   this.command = command;
 
-  // We&#x27;re on Windows if `process.platform` starts with &#x22;win&#x22;, i.e. &#x22;win32&#x22;.
-  this.isWindows = (process.platform.lastIndexOf(&#x27;win&#x27;) === 0);
+  // We're on Windows if `process.platform` starts with "win", i.e. "win32".
+  this.isWindows = (process.platform.lastIndexOf('win') === 0);
 
   // the cwd and environment of the command are the same as the main node
   // process by default.
   this.options = defaults(options || {}, {
     cwd: process.cwd(),
     env: process.env,
-    verbosity: (options &#x26;&#x26; options.silent) ? 1 : 2,
+    verbosity: (options &amp;&amp; options.silent) ? 1 : 2,
     usePowerShell: false
   });
 
   // include node_modules/.bin on the path when we execute the command.
   previousPath = this.options.env.PATH;
-  this.options.env.PATH = path.join(this.options.cwd, &#x27;node_modules&#x27;, &#x27;.bin&#x27;);
+  this.options.env.PATH = path.join(this.options.cwd, 'node_modules', '.bin');
   this.options.env.PATH += path.delimiter;
   this.options.env.PATH += previousPath;
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-    .src(&#x27;path/to/input/*&#x27;)             // get input files.
-    .pipe(run(&#x27;awk &#x22;NR % 2 == 0&#x22;&#x27;))     // use awk to extract the even lines.
-    .pipe(gulp.dest(&#x27;path/to/output&#x27;))  // profit.
+    .src('path/to/input/*')             // get input files.
+    .pipe(run('awk "NR % 2 == 0"'))     // use awk to extract the even lines.
+    .pipe(gulp.dest('path/to/output'))  // profit.
   ;
 });
 
 // use gulp-run without gulp
-var cmd = new run.<span class="apidocCodeKeywordSpan">Command</span>(&#x27;cat&#x27;);  // create a command object for `cat`.
-cmd.exec(&#x27;hello world&#x27;);           // call `cat` with &#x27;hello world&#x27; on stdin.
+var cmd = new run.<span class="apidocCodeKeywordSpan">Command</span>('cat');  // create a command object for `cat`.
+cmd.exec('hello world');           // call `cat` with 'hello world' on stdin.
 ```
 
 ## API
@@ -293,18 +286,18 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
   // parse the arguments, both are optional.
   // after parsing, stdin is a vinyl file to use as standard input to
   // the command (possibly empty), and callback is a function.
-  if (typeof stdin === &#x27;function&#x27;) {
+  if (typeof stdin === 'function') {
     callback = stdin;
     stdin = undefined;
-  } else if (typeof callback !== &#x27;function&#x27;) {
+  } else if (typeof callback !== 'function') {
     callback = function noop() {};
   }
 
   if (!(stdin instanceof Vinyl)) {
-    fileName = this.command.split(&#x27; &#x27;)[0];
+    fileName = this.command.split(' ')[0];
     directory = path.join(this.options.cwd, fileName);
 
-    if (typeof stdin === &#x27;string&#x27;) {
+    if (typeof stdin === 'string') {
       stdin = new Vinyl({
         path: directory,
         contents: new Buffer(stdin)
@@ -325,26 +318,26 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
 
   // execute the command.
   // we spawn the command in a subshell, so things like i/o redirection
-  // just work. e.g. `echo hello world &#x3e;&#x3e; ./hello.txt` works as expected.
+  // just work. e.g. `echo hello world &gt;&gt; ./hello.txt` works as expected.
   command = applyTemplate(this.command)({
     file: stdin
   });
 
-  if (this.isWindows &#x26;&#x26; this.options.usePowerShell) {
+  if (this.isWindows &amp;&amp; this.options.usePowerShell) {
     // windows powershell
-    subShell = cp.spawn(&#x27;powershell.exe&#x27;, [&#x27;-NonInteractive&#x27;, &#x27;-NoLogo&#x27;, &#x27;-Command&#x27;, command], {
+    subShell = cp.spawn('powershell.exe', ['-NonInteractive', '-NoLogo', '-Command', command], {
       env: this.options.env,
       cwd: this.options.cwd
     });
   } else if (this.isWindows) {
     // windows cmd.exe
-    subShell = cp.spawn(&#x27;cmd.exe&#x27;, [&#x27;/c&#x27;, command], {
+    subShell = cp.spawn('cmd.exe', ['/c', command], {
       env: this.options.env,
       cwd: this.options.cwd
     });
   } else {
     // POSIX shell
-    subShell = cp.spawn(&#x27;sh&#x27;, [&#x27;-c&#x27;, command], {
+    subShell = cp.spawn('sh', ['-c', command], {
       env: this.options.env,
       cwd: this.options.cwd
     });
@@ -353,18 +346,18 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
   // setup the output
   //
   // - if verbosity equals to 3, the command prints directly to the terminal.
-  // - if verbosity equals to 2, the command&#x27;s stdout and stderr are buffered
-  //   and printed to the user&#x27;s terminal after the command exits (this
+  // - if verbosity equals to 2, the command's stdout and stderr are buffered
+  //   and printed to the user's terminal after the command exits (this
   //   prevents overlaping output of multiple commands)
-  // - if verbosity equals to 1, the command&#x27;s stderr is buffered as in 2, but
+  // - if verbosity equals to 1, the command's stderr is buffered as in 2, but
   //   the stdout is silenced.
   log = new stream.PassThrough();
 
   function sendLog(context) {
     var title = util.format(
-      &#x27;$ %s%s&#x27;,
+      '$ %s%s',
       gutil.colors.blue(command),
-      (self.options.verbosity &#x3c; 2) ? gutil.colors.grey(&#x27; # Silenced\n&#x27;) : &#x27;\n&#x27;
+      (self.options.verbosity &lt; 2) ? gutil.colors.grey(' # Silenced\n') : '\n'
     );
 
     context.write(title);
@@ -386,7 +379,7 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
   }
 
   // setup the cleanup proceedure for when the command finishes.
-  subShell.once(&#x27;close&#x27;, function handleSubShellClose() {
+  subShell.once('close', function handleSubShellClose() {
     // write the buffered output to stdout
     var content = log.read();
 
@@ -395,10 +388,10 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
     }
   });
 
-  subShell.once(&#x27;exit&#x27;, function handleSubShellExit(code) {
+  subShell.once('exit', function handleSubShellExit(code) {
     // report an error if the command exited with a non-zero exit code.
     if (code !== 0) {
-      err = new Error(util.format(&#x27;Command `%s` exited with code %s&#x27;, command, code));
+      err = new Error(util.format('Command `%s` exited with code %s', command, code));
       err.status = code;
 
       return callback(err);
@@ -412,7 +405,7 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
   stdout = stdin.clone();
   stdout.contents = subShell.stdout.pipe(new stream.PassThrough());
 
-  // finally, write the input to the process&#x27;s stdin.
+  // finally, write the input to the process's stdin.
   stdin.pipe(subShell.stdin);
 
   return stdout;
@@ -463,16 +456,16 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
   this._readableState.sync = false;
 
   if (options) {
-    if (typeof options.transform === &#x27;function&#x27;)
+    if (typeof options.transform === 'function')
       this._transform = options.transform;
 
-    if (typeof options.flush === &#x27;function&#x27;)
+    if (typeof options.flush === 'function')
       this._flush = options.flush;
   }
 
   // When the writable side finishes, then flush out anything remaining.
-  this.once(&#x27;prefinish&#x27;, function() {
-    if (typeof this._flush === &#x27;function&#x27;)
+  this.once('prefinish', function() {
+    if (typeof this._flush === 'function')
       this._flush(function(er) {
         done(stream, er);
       });
@@ -519,34 +512,34 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
 
   this.command = command;
 
-  // We&#x27;re on Windows if `process.platform` starts with &#x22;win&#x22;, i.e. &#x22;win32&#x22;.
-  this.isWindows = (process.platform.lastIndexOf(&#x27;win&#x27;) === 0);
+  // We're on Windows if `process.platform` starts with "win", i.e. "win32".
+  this.isWindows = (process.platform.lastIndexOf('win') === 0);
 
   // the cwd and environment of the command are the same as the main node
   // process by default.
   this.options = defaults(options || {}, {
     cwd: process.cwd(),
     env: process.env,
-    verbosity: (options &#x26;&#x26; options.silent) ? 1 : 2,
+    verbosity: (options &amp;&amp; options.silent) ? 1 : 2,
     usePowerShell: false
   });
 
   // include node_modules/.bin on the path when we execute the command.
   previousPath = this.options.env.PATH;
-  this.options.env.PATH = path.join(this.options.cwd, &#x27;node_modules&#x27;, &#x27;.bin&#x27;);
+  this.options.env.PATH = path.join(this.options.cwd, 'node_modules', '.bin');
   this.options.env.PATH += path.delimiter;
   this.options.env.PATH += previousPath;
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-    .src(&#x27;path/to/input/*&#x27;)             // get input files.
-    .pipe(run(&#x27;awk &#x22;NR % 2 == 0&#x22;&#x27;))     // use awk to extract the even lines.
-    .pipe(gulp.dest(&#x27;path/to/output&#x27;))  // profit.
+    .src('path/to/input/*')             // get input files.
+    .pipe(run('awk "NR % 2 == 0"'))     // use awk to extract the even lines.
+    .pipe(gulp.dest('path/to/output'))  // profit.
   ;
 });
 
 // use gulp-run without gulp
-var cmd = new run.<span class="apidocCodeKeywordSpan">Command</span>(&#x27;cat&#x27;);  // create a command object for `cat`.
-cmd.exec(&#x27;hello world&#x27;);           // call `cat` with &#x27;hello world&#x27; on stdin.
+var cmd = new run.<span class="apidocCodeKeywordSpan">Command</span>('cat');  // create a command object for `cat`.
+cmd.exec('hello world');           // call `cat` with 'hello world' on stdin.
 ```
 
 ## API
@@ -582,18 +575,18 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
   // parse the arguments, both are optional.
   // after parsing, stdin is a vinyl file to use as standard input to
   // the command (possibly empty), and callback is a function.
-  if (typeof stdin === &#x27;function&#x27;) {
+  if (typeof stdin === 'function') {
     callback = stdin;
     stdin = undefined;
-  } else if (typeof callback !== &#x27;function&#x27;) {
+  } else if (typeof callback !== 'function') {
     callback = function noop() {};
   }
 
   if (!(stdin instanceof Vinyl)) {
-    fileName = this.command.split(&#x27; &#x27;)[0];
+    fileName = this.command.split(' ')[0];
     directory = path.join(this.options.cwd, fileName);
 
-    if (typeof stdin === &#x27;string&#x27;) {
+    if (typeof stdin === 'string') {
       stdin = new Vinyl({
         path: directory,
         contents: new Buffer(stdin)
@@ -614,26 +607,26 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
 
   // execute the command.
   // we spawn the command in a subshell, so things like i/o redirection
-  // just work. e.g. `echo hello world &#x3e;&#x3e; ./hello.txt` works as expected.
+  // just work. e.g. `echo hello world &gt;&gt; ./hello.txt` works as expected.
   command = applyTemplate(this.command)({
     file: stdin
   });
 
-  if (this.isWindows &#x26;&#x26; this.options.usePowerShell) {
+  if (this.isWindows &amp;&amp; this.options.usePowerShell) {
     // windows powershell
-    subShell = cp.spawn(&#x27;powershell.exe&#x27;, [&#x27;-NonInteractive&#x27;, &#x27;-NoLogo&#x27;, &#x27;-Command&#x27;, command], {
+    subShell = cp.spawn('powershell.exe', ['-NonInteractive', '-NoLogo', '-Command', command], {
       env: this.options.env,
       cwd: this.options.cwd
     });
   } else if (this.isWindows) {
     // windows cmd.exe
-    subShell = cp.spawn(&#x27;cmd.exe&#x27;, [&#x27;/c&#x27;, command], {
+    subShell = cp.spawn('cmd.exe', ['/c', command], {
       env: this.options.env,
       cwd: this.options.cwd
     });
   } else {
     // POSIX shell
-    subShell = cp.spawn(&#x27;sh&#x27;, [&#x27;-c&#x27;, command], {
+    subShell = cp.spawn('sh', ['-c', command], {
       env: this.options.env,
       cwd: this.options.cwd
     });
@@ -642,18 +635,18 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
   // setup the output
   //
   // - if verbosity equals to 3, the command prints directly to the terminal.
-  // - if verbosity equals to 2, the command&#x27;s stdout and stderr are buffered
-  //   and printed to the user&#x27;s terminal after the command exits (this
+  // - if verbosity equals to 2, the command's stdout and stderr are buffered
+  //   and printed to the user's terminal after the command exits (this
   //   prevents overlaping output of multiple commands)
-  // - if verbosity equals to 1, the command&#x27;s stderr is buffered as in 2, but
+  // - if verbosity equals to 1, the command's stderr is buffered as in 2, but
   //   the stdout is silenced.
   log = new stream.PassThrough();
 
   function sendLog(context) {
     var title = util.format(
-      &#x27;$ %s%s&#x27;,
+      '$ %s%s',
       gutil.colors.blue(command),
-      (self.options.verbosity &#x3c; 2) ? gutil.colors.grey(&#x27; # Silenced\n&#x27;) : &#x27;\n&#x27;
+      (self.options.verbosity &lt; 2) ? gutil.colors.grey(' # Silenced\n') : '\n'
     );
 
     context.write(title);
@@ -675,7 +668,7 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
   }
 
   // setup the cleanup proceedure for when the command finishes.
-  subShell.once(&#x27;close&#x27;, function handleSubShellClose() {
+  subShell.once('close', function handleSubShellClose() {
     // write the buffered output to stdout
     var content = log.read();
 
@@ -684,10 +677,10 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
     }
   });
 
-  subShell.once(&#x27;exit&#x27;, function handleSubShellExit(code) {
+  subShell.once('exit', function handleSubShellExit(code) {
     // report an error if the command exited with a non-zero exit code.
     if (code !== 0) {
-      err = new Error(util.format(&#x27;Command `%s` exited with code %s&#x27;, command, code));
+      err = new Error(util.format('Command `%s` exited with code %s', command, code));
       err.status = code;
 
       return callback(err);
@@ -701,7 +694,7 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
   stdout = stdin.clone();
   stdout.contents = subShell.stdout.pipe(new stream.PassThrough());
 
-  // finally, write the input to the process&#x27;s stdin.
+  // finally, write the input to the process's stdin.
   stdin.pipe(subShell.stdin);
 
   return stdout;
@@ -710,19 +703,19 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
 ## Usage
 
 ```javascript
-var run = require(&#x27;gulp-run&#x27;);
+var run = require('gulp-run');
 
 // use gulp-run to start a pipeline
-gulp.task(&#x27;hello-world&#x27;, function() {
-  return run(&#x27;echo Hello World&#x27;).<span class="apidocCodeKeywordSpan">exec</span>()    // prints &#x22;Hello World\n&#x22
+gulp.task('hello-world', function() {
+  return run('echo Hello World').<span class="apidocCodeKeywordSpan">exec</span>()    // prints "Hello World\n"
 ;.
-    .pipe(gulp.dest(&#x27;output&#x27;))      // writes &#x22;Hello World\n&#x22; to output/echo.
+    .pipe(gulp.dest('output'))      // writes "Hello World\n" to output/echo.
   ;
 })
 
 
 // use gulp-run in the middle of a pipeline:
-gulp.task(&#x27;even-lines&#x27;, function() {
+gulp.task('even-lines', function() {
 ...</pre></li>
     </ul>
 
@@ -768,18 +761,18 @@ gulp.task(&#x27;even-lines&#x27;, function() {
   // parse the arguments, both are optional.
   // after parsing, stdin is a vinyl file to use as standard input to
   // the command (possibly empty), and callback is a function.
-  if (typeof stdin === &#x27;function&#x27;) {
+  if (typeof stdin === 'function') {
     callback = stdin;
     stdin = undefined;
-  } else if (typeof callback !== &#x27;function&#x27;) {
+  } else if (typeof callback !== 'function') {
     callback = function noop() {};
   }
 
   if (!(stdin instanceof Vinyl)) {
-    fileName = this.command.split(&#x27; &#x27;)[0];
+    fileName = this.command.split(' ')[0];
     directory = path.join(this.options.cwd, fileName);
 
-    if (typeof stdin === &#x27;string&#x27;) {
+    if (typeof stdin === 'string') {
       stdin = new Vinyl({
         path: directory,
         contents: new Buffer(stdin)
@@ -800,26 +793,26 @@ gulp.task(&#x27;even-lines&#x27;, function() {
 
   // execute the command.
   // we spawn the command in a subshell, so things like i/o redirection
-  // just work. e.g. `echo hello world &#x3e;&#x3e; ./hello.txt` works as expected.
+  // just work. e.g. `echo hello world &gt;&gt; ./hello.txt` works as expected.
   command = applyTemplate(this.command)({
     file: stdin
   });
 
-  if (this.isWindows &#x26;&#x26; this.options.usePowerShell) {
+  if (this.isWindows &amp;&amp; this.options.usePowerShell) {
     // windows powershell
-    subShell = cp.spawn(&#x27;powershell.exe&#x27;, [&#x27;-NonInteractive&#x27;, &#x27;-NoLogo&#x27;, &#x27;-Command&#x27;, command], {
+    subShell = cp.spawn('powershell.exe', ['-NonInteractive', '-NoLogo', '-Command', command], {
       env: this.options.env,
       cwd: this.options.cwd
     });
   } else if (this.isWindows) {
     // windows cmd.exe
-    subShell = cp.spawn(&#x27;cmd.exe&#x27;, [&#x27;/c&#x27;, command], {
+    subShell = cp.spawn('cmd.exe', ['/c', command], {
       env: this.options.env,
       cwd: this.options.cwd
     });
   } else {
     // POSIX shell
-    subShell = cp.spawn(&#x27;sh&#x27;, [&#x27;-c&#x27;, command], {
+    subShell = cp.spawn('sh', ['-c', command], {
       env: this.options.env,
       cwd: this.options.cwd
     });
@@ -828,18 +821,18 @@ gulp.task(&#x27;even-lines&#x27;, function() {
   // setup the output
   //
   // - if verbosity equals to 3, the command prints directly to the terminal.
-  // - if verbosity equals to 2, the command&#x27;s stdout and stderr are buffered
-  //   and printed to the user&#x27;s terminal after the command exits (this
+  // - if verbosity equals to 2, the command's stdout and stderr are buffered
+  //   and printed to the user's terminal after the command exits (this
   //   prevents overlaping output of multiple commands)
-  // - if verbosity equals to 1, the command&#x27;s stderr is buffered as in 2, but
+  // - if verbosity equals to 1, the command's stderr is buffered as in 2, but
   //   the stdout is silenced.
   log = new stream.PassThrough();
 
   function sendLog(context) {
     var title = util.format(
-      &#x27;$ %s%s&#x27;,
+      '$ %s%s',
       gutil.colors.blue(command),
-      (self.options.verbosity &#x3c; 2) ? gutil.colors.grey(&#x27; # Silenced\n&#x27;) : &#x27;\n&#x27;
+      (self.options.verbosity &lt; 2) ? gutil.colors.grey(' # Silenced\n') : '\n'
     );
 
     context.write(title);
@@ -861,7 +854,7 @@ gulp.task(&#x27;even-lines&#x27;, function() {
   }
 
   // setup the cleanup proceedure for when the command finishes.
-  subShell.once(&#x27;close&#x27;, function handleSubShellClose() {
+  subShell.once('close', function handleSubShellClose() {
     // write the buffered output to stdout
     var content = log.read();
 
@@ -870,10 +863,10 @@ gulp.task(&#x27;even-lines&#x27;, function() {
     }
   });
 
-  subShell.once(&#x27;exit&#x27;, function handleSubShellExit(code) {
+  subShell.once('exit', function handleSubShellExit(code) {
     // report an error if the command exited with a non-zero exit code.
     if (code !== 0) {
-      err = new Error(util.format(&#x27;Command `%s` exited with code %s&#x27;, command, code));
+      err = new Error(util.format('Command `%s` exited with code %s', command, code));
       err.status = code;
 
       return callback(err);
@@ -887,7 +880,7 @@ gulp.task(&#x27;even-lines&#x27;, function() {
   stdout = stdin.clone();
   stdout.contents = subShell.stdout.pipe(new stream.PassThrough());
 
-  // finally, write the input to the process&#x27;s stdin.
+  // finally, write the input to the process's stdin.
   stdin.pipe(subShell.stdin);
 
   return stdout;
@@ -896,19 +889,19 @@ gulp.task(&#x27;even-lines&#x27;, function() {
 ## Usage
 
 ```javascript
-var run = require(&#x27;gulp-run&#x27;);
+var run = require('gulp-run');
 
 // use gulp-run to start a pipeline
-gulp.task(&#x27;hello-world&#x27;, function() {
-  return run(&#x27;echo Hello World&#x27;).<span class="apidocCodeKeywordSpan">exec</span>()    // prints &#x22;Hello World\n&#x22
+gulp.task('hello-world', function() {
+  return run('echo Hello World').<span class="apidocCodeKeywordSpan">exec</span>()    // prints "Hello World\n"
 ;.
-    .pipe(gulp.dest(&#x27;output&#x27;))      // writes &#x22;Hello World\n&#x22; to output/echo.
+    .pipe(gulp.dest('output'))      // writes "Hello World\n" to output/echo.
   ;
 })
 
 
 // use gulp-run in the middle of a pipeline:
-gulp.task(&#x27;even-lines&#x27;, function() {
+gulp.task('even-lines', function() {
 ...</pre></li>
     </ul>
 
@@ -957,3 +950,4 @@ gulp.task(&#x27;even-lines&#x27;, function() {
     ]
 </div>
 </div>
+</body></html>
