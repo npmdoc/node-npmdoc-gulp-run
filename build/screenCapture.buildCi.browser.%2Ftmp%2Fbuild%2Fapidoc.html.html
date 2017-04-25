@@ -74,36 +74,9 @@
 
         <li>
 
-            <a class="apidocElementLiA" href="#apidoc.element.gulp-run.Command.prototype.exec">
-            function <span class="apidocSignatureSpan">gulp-run.</span>Command.prototype.exec
-            <span class="apidocSignatureSpan">(stdin, callback)</span>
-            </a>
-
-        </li>
-
-        <li>
-
-            <a class="apidocElementLiA" href="#apidoc.element.gulp-run.Command.prototype.toString">
-            function <span class="apidocSignatureSpan">gulp-run.</span>Command.prototype.toString
-            <span class="apidocSignatureSpan">()</span>
-            </a>
-
-        </li>
-
-        <li>
-
             <a class="apidocElementLiA" href="#apidoc.element.gulp-run.super_">
             function <span class="apidocSignatureSpan">gulp-run.</span>super_
             <span class="apidocSignatureSpan">(options)</span>
-            </a>
-
-        </li>
-
-        <li>
-
-            <a class="apidocElementLiA" href="#apidoc.element.gulp-run.toString">
-            function <span class="apidocSignatureSpan">gulp-run.</span>toString
-            <span class="apidocSignatureSpan">()</span>
             </a>
 
         </li>
@@ -144,45 +117,6 @@
 
             <a class="apidocElementLiA" href="#apidoc.element.gulp-run.Command.prototype.toString">
             function <span class="apidocSignatureSpan">gulp-run.Command.prototype.</span>toString
-            <span class="apidocSignatureSpan">()</span>
-            </a>
-
-        </li>
-
-    </ol></li>
-
-    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-run.Command.prototype.exec">module gulp-run.Command.prototype.exec</a><ol>
-
-        <li>
-
-            <a class="apidocElementLiA" href="#apidoc.element.gulp-run.Command.prototype.exec.exec">
-            function <span class="apidocSignatureSpan">gulp-run.Command.prototype.</span>exec
-            <span class="apidocSignatureSpan">(stdin, callback)</span>
-            </a>
-
-        </li>
-
-    </ol></li>
-
-    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-run.Command.prototype.toString">module gulp-run.Command.prototype.toString</a><ol>
-
-        <li>
-
-            <a class="apidocElementLiA" href="#apidoc.element.gulp-run.Command.prototype.toString.toString">
-            function <span class="apidocSignatureSpan">gulp-run.Command.prototype.</span>toString
-            <span class="apidocSignatureSpan">()</span>
-            </a>
-
-        </li>
-
-    </ol></li>
-
-    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-run.toString">module gulp-run.toString</a><ol>
-
-        <li>
-
-            <a class="apidocElementLiA" href="#apidoc.element.gulp-run.toString.toString">
-            function <span class="apidocSignatureSpan">gulp-run.</span>toString
             <span class="apidocSignatureSpan">()</span>
             </a>
 
@@ -267,170 +201,6 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
 
 
     <h2>
-        <a href="#apidoc.element.gulp-run.Command.prototype.exec" id="apidoc.element.gulp-run.Command.prototype.exec">
-        function <span class="apidocSignatureSpan">gulp-run.</span>Command.prototype.exec
-        <span class="apidocSignatureSpan">(stdin, callback)</span>
-        </a>
-    </h2>
-    <ul>
-    <li>description and source-code<pre class="apidocCodePre">function exec(stdin, callback) {
-  var self = this;
-  var command;
-  var fileName;
-  var directory;
-  var subShell;
-  var log;
-  var err;
-  var stdout;
-
-  // parse the arguments, both are optional.
-  // after parsing, stdin is a vinyl file to use as standard input to
-  // the command (possibly empty), and callback is a function.
-  if (typeof stdin === 'function') {
-    callback = stdin;
-    stdin = undefined;
-  } else if (typeof callback !== 'function') {
-    callback = function noop() {};
-  }
-
-  if (!(stdin instanceof Vinyl)) {
-    fileName = this.command.split(' ')[0];
-    directory = path.join(this.options.cwd, fileName);
-
-    if (typeof stdin === 'string') {
-      stdin = new Vinyl({
-        path: directory,
-        contents: new Buffer(stdin)
-      });
-    } else if (stdin instanceof Buffer || stdin instanceof stream.Readable) {
-      stdin = new Vinyl({
-        path: directory,
-        contents: stdin
-      });
-    } else {
-      stdin = new Vinyl(stdin);
-
-      if (!stdin.path) {
-        stdin.path = directory;
-      }
-    }
-  }
-
-  // execute the command.
-  // we spawn the command in a subshell, so things like i/o redirection
-  // just work. e.g. `echo hello world &gt;&gt; ./hello.txt` works as expected.
-  command = applyTemplate(this.command)({
-    file: stdin
-  });
-
-  if (this.isWindows &amp;&amp; this.options.usePowerShell) {
-    // windows powershell
-    subShell = cp.spawn('powershell.exe', ['-NonInteractive', '-NoLogo', '-Command', command], {
-      env: this.options.env,
-      cwd: this.options.cwd
-    });
-  } else if (this.isWindows) {
-    // windows cmd.exe
-    subShell = cp.spawn('cmd.exe', ['/c', command], {
-      env: this.options.env,
-      cwd: this.options.cwd
-    });
-  } else {
-    // POSIX shell
-    subShell = cp.spawn('sh', ['-c', command], {
-      env: this.options.env,
-      cwd: this.options.cwd
-    });
-  }
-
-  // setup the output
-  //
-  // - if verbosity equals to 3, the command prints directly to the terminal.
-  // - if verbosity equals to 2, the command's stdout and stderr are buffered
-  //   and printed to the user's terminal after the command exits (this
-  //   prevents overlaping output of multiple commands)
-  // - if verbosity equals to 1, the command's stderr is buffered as in 2, but
-  //   the stdout is silenced.
-  log = new stream.PassThrough();
-
-  function sendLog(context) {
-    var title = util.format(
-      '$ %s%s',
-      gutil.colors.blue(command),
-      (self.options.verbosity &lt; 2) ? gutil.colors.grey(' # Silenced\n') : '\n'
-    );
-
-    context.write(title);
-  }
-
-  switch (this.options.verbosity) {
-    case 3:
-      sendLog(process.stdout);
-      subShell.stdout.pipe(process.stdout);
-      subShell.stderr.pipe(process.stderr);
-      break;
-    case 2:
-      subShell.stdout.pipe(log);
-      // fallthrough
-    case 1:
-      subShell.stderr.pipe(log);
-      sendLog(log);
-      break;
-  }
-
-  // setup the cleanup proceedure for when the command finishes.
-  subShell.once('close', function handleSubShellClose() {
-    // write the buffered output to stdout
-    var content = log.read();
-
-    if (content !== null) {
-      process.stdout.write(content);
-    }
-  });
-
-  subShell.once('exit', function handleSubShellExit(code) {
-    // report an error if the command exited with a non-zero exit code.
-    if (code !== 0) {
-      err = new Error(util.format('Command `%s` exited with code %s', command, code));
-      err.status = code;
-
-      return callback(err);
-    }
-
-    callback(null);
-  });
-
-  // the file wrapping stdout is as the one wrapping stdin (same metadata)
-  // with different contents.
-  stdout = stdin.clone();
-  stdout.contents = subShell.stdout.pipe(new stream.PassThrough());
-
-  // finally, write the input to the process's stdin.
-  stdin.pipe(subShell.stdin);
-
-  return stdout;
-}</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
-    </ul>
-
-
-
-    <h2>
-        <a href="#apidoc.element.gulp-run.Command.prototype.toString" id="apidoc.element.gulp-run.Command.prototype.toString">
-        function <span class="apidocSignatureSpan">gulp-run.</span>Command.prototype.toString
-        <span class="apidocSignatureSpan">()</span>
-        </a>
-    </h2>
-    <ul>
-    <li>description and source-code<pre class="apidocCodePre">function toString() {
-  return this.command;
-}</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
-    </ul>
-
-
-
-    <h2>
         <a href="#apidoc.element.gulp-run.super_" id="apidoc.element.gulp-run.super_">
         function <span class="apidocSignatureSpan">gulp-run.</span>super_
         <span class="apidocSignatureSpan">(options)</span>
@@ -472,21 +242,6 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
     else
       done(stream);
   });
-}</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
-    </ul>
-
-
-
-    <h2>
-        <a href="#apidoc.element.gulp-run.toString" id="apidoc.element.gulp-run.toString">
-        function <span class="apidocSignatureSpan">gulp-run.</span>toString
-        <span class="apidocSignatureSpan">()</span>
-        </a>
-    </h2>
-    <ul>
-    <li>description and source-code<pre class="apidocCodePre">toString = function () {
-    return text;
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
@@ -700,22 +455,21 @@ Creates a Vinyl (gulp) stream that transforms its input by piping it to a shell 
   return stdout;
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-## Usage
+/**
+* @param  {string}   file
+* @param  {string}   encoding
+* @param  {function} callback
+* @return {void}
+*/
+GulpRunner.prototype._transform = function _transform(file, encoding, callback) {
+ var newfile = this.command.<span class="apidocCodeKeywordSpan">exec</span>(file, callback);
+ this.push(newfile);
+};
 
-```javascript
-var run = require('gulp-run');
-
-// use gulp-run to start a pipeline
-gulp.task('hello-world', function() {
-  return run('echo Hello World').<span class="apidocCodeKeywordSpan">exec</span>()    // prints "Hello World\n"
-;.
-    .pipe(gulp.dest('output'))      // writes "Hello World\n" to output/echo.
-  ;
-})
-
-
-// use gulp-run in the middle of a pipeline:
-gulp.task('even-lines', function() {
+/**
+* Writes `stdin` to itself and returns itself.
+*
+* Whenever an object is written into the GulpRunner, a new process is
 ...</pre></li>
     </ul>
 
@@ -731,214 +485,23 @@ gulp.task('even-lines', function() {
     <li>description and source-code<pre class="apidocCodePre">function toString() {
   return this.command;
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
-    </ul>
-
-
-</div>
-
-<div class="apidocSectionDiv">
-<h1><a href="#apidoc.module.gulp-run.Command.prototype.exec" id="apidoc.module.gulp-run.Command.prototype.exec">module gulp-run.Command.prototype.exec</a></h1>
-
-
-    <h2>
-        <a href="#apidoc.element.gulp-run.Command.prototype.exec.exec" id="apidoc.element.gulp-run.Command.prototype.exec.exec">
-        function <span class="apidocSignatureSpan">gulp-run.Command.prototype.</span>exec
-        <span class="apidocSignatureSpan">(stdin, callback)</span>
-        </a>
-    </h2>
-    <ul>
-    <li>description and source-code<pre class="apidocCodePre">function exec(stdin, callback) {
-  var self = this;
-  var command;
-  var fileName;
-  var directory;
-  var subShell;
-  var log;
-  var err;
-  var stdout;
-
-  // parse the arguments, both are optional.
-  // after parsing, stdin is a vinyl file to use as standard input to
-  // the command (possibly empty), and callback is a function.
-  if (typeof stdin === 'function') {
-    callback = stdin;
-    stdin = undefined;
-  } else if (typeof callback !== 'function') {
-    callback = function noop() {};
-  }
-
-  if (!(stdin instanceof Vinyl)) {
-    fileName = this.command.split(' ')[0];
-    directory = path.join(this.options.cwd, fileName);
-
-    if (typeof stdin === 'string') {
-      stdin = new Vinyl({
-        path: directory,
-        contents: new Buffer(stdin)
-      });
-    } else if (stdin instanceof Buffer || stdin instanceof stream.Readable) {
-      stdin = new Vinyl({
-        path: directory,
-        contents: stdin
-      });
-    } else {
-      stdin = new Vinyl(stdin);
-
-      if (!stdin.path) {
-        stdin.path = directory;
-      }
-    }
-  }
-
-  // execute the command.
-  // we spawn the command in a subshell, so things like i/o redirection
-  // just work. e.g. `echo hello world &gt;&gt; ./hello.txt` works as expected.
-  command = applyTemplate(this.command)({
-    file: stdin
-  });
-
-  if (this.isWindows &amp;&amp; this.options.usePowerShell) {
-    // windows powershell
-    subShell = cp.spawn('powershell.exe', ['-NonInteractive', '-NoLogo', '-Command', command], {
-      env: this.options.env,
-      cwd: this.options.cwd
-    });
-  } else if (this.isWindows) {
-    // windows cmd.exe
-    subShell = cp.spawn('cmd.exe', ['/c', command], {
-      env: this.options.env,
-      cwd: this.options.cwd
-    });
-  } else {
-    // POSIX shell
-    subShell = cp.spawn('sh', ['-c', command], {
-      env: this.options.env,
-      cwd: this.options.cwd
-    });
-  }
-
-  // setup the output
-  //
-  // - if verbosity equals to 3, the command prints directly to the terminal.
-  // - if verbosity equals to 2, the command's stdout and stderr are buffered
-  //   and printed to the user's terminal after the command exits (this
-  //   prevents overlaping output of multiple commands)
-  // - if verbosity equals to 1, the command's stderr is buffered as in 2, but
-  //   the stdout is silenced.
-  log = new stream.PassThrough();
-
-  function sendLog(context) {
-    var title = util.format(
-      '$ %s%s',
-      gutil.colors.blue(command),
-      (self.options.verbosity &lt; 2) ? gutil.colors.grey(' # Silenced\n') : '\n'
-    );
-
-    context.write(title);
-  }
-
-  switch (this.options.verbosity) {
-    case 3:
-      sendLog(process.stdout);
-      subShell.stdout.pipe(process.stdout);
-      subShell.stderr.pipe(process.stderr);
-      break;
-    case 2:
-      subShell.stdout.pipe(log);
-      // fallthrough
-    case 1:
-      subShell.stderr.pipe(log);
-      sendLog(log);
-      break;
-  }
-
-  // setup the cleanup proceedure for when the command finishes.
-  subShell.once('close', function handleSubShellClose() {
-    // write the buffered output to stdout
-    var content = log.read();
-
-    if (content !== null) {
-      process.stdout.write(content);
-    }
-  });
-
-  subShell.once('exit', function handleSubShellExit(code) {
-    // report an error if the command exited with a non-zero exit code.
-    if (code !== 0) {
-      err = new Error(util.format('Command `%s` exited with code %s', command, code));
-      err.status = code;
-
-      return callback(err);
-    }
-
-    callback(null);
-  });
-
-  // the file wrapping stdout is as the one wrapping stdin (same metadata)
-  // with different contents.
-  stdout = stdin.clone();
-  stdout.contents = subShell.stdout.pipe(new stream.PassThrough());
-
-  // finally, write the input to the process's stdin.
-  stdin.pipe(subShell.stdin);
-
-  return stdout;
-}</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-## Usage
+ * @param  {string|RegExp} match
+ * @return {Stream}
+ */
+module.exports.compare = function compare(match) {
+var stream;
 
-```javascript
-var run = require('gulp-run');
+if (!(match instanceof RegExp)) {
+  match = new RegExp('^' + match.<span class="apidocCodeKeywordSpan">toString</span>() + '$');
+}
 
-// use gulp-run to start a pipeline
-gulp.task('hello-world', function() {
-  return run('echo Hello World').<span class="apidocCodeKeywordSpan">exec</span>()    // prints "Hello World\n"
-;.
-    .pipe(gulp.dest('output'))      // writes "Hello World\n" to output/echo.
-  ;
-})
+stream = new Stream.Transform({
+  objectMode: true
+});
 
-
-// use gulp-run in the middle of a pipeline:
-gulp.task('even-lines', function() {
+stream._transform = function _transform(file, encoding, callback) {
 ...</pre></li>
-    </ul>
-
-
-</div>
-
-<div class="apidocSectionDiv">
-<h1><a href="#apidoc.module.gulp-run.Command.prototype.toString" id="apidoc.module.gulp-run.Command.prototype.toString">module gulp-run.Command.prototype.toString</a></h1>
-
-
-    <h2>
-        <a href="#apidoc.element.gulp-run.Command.prototype.toString.toString" id="apidoc.element.gulp-run.Command.prototype.toString.toString">
-        function <span class="apidocSignatureSpan">gulp-run.Command.prototype.</span>toString
-        <span class="apidocSignatureSpan">()</span>
-        </a>
-    </h2>
-    <ul>
-    <li>description and source-code<pre class="apidocCodePre">function toString() { [native code] }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
-    </ul>
-
-
-</div>
-
-<div class="apidocSectionDiv">
-<h1><a href="#apidoc.module.gulp-run.toString" id="apidoc.module.gulp-run.toString">module gulp-run.toString</a></h1>
-
-
-    <h2>
-        <a href="#apidoc.element.gulp-run.toString.toString" id="apidoc.element.gulp-run.toString.toString">
-        function <span class="apidocSignatureSpan">gulp-run.</span>toString
-        <span class="apidocSignatureSpan">()</span>
-        </a>
-    </h2>
-    <ul>
-    <li>description and source-code<pre class="apidocCodePre">function toString() { [native code] }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
 
 
