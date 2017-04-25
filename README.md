@@ -1,8 +1,8 @@
 # npmdoc-gulp-run
 
-api documentation for  [gulp-run (v1.7.1)](https://github.com/MrBoolean/gulp-run)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-run.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-run) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-run.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-run)
+#### basic api documentation for  [gulp-run (v1.7.1)](https://github.com/MrBoolean/gulp-run)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-run.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-run) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-run.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-run)
 
-Pipe to shell commands in gulp
+#### Pipe to shell commands in gulp
 
 [![NPM](https://nodei.co/npm/gulp-run.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/gulp-run)
 
@@ -83,7 +83,8 @@ Pipe to shell commands in gulp
         "url": "git://github.com/MrBoolean/gulp-run.git"
     },
     "scripts": {},
-    "version": "1.7.1"
+    "version": "1.7.1",
+    "bin": {}
 }
 ```
 
